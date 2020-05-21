@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.kekee.mapper.UserMapper">
+	<resultMap type="User" id="userMap">
+		<id column="id" property="id" />
+		<result column="userCode" property="userCode" />
+		<result column="userName" property="userName" />
+		<result column="userPassword" property="userPassword" />
+		<result column="gender" property="gender" />
+		<result column="birthday" property="birthday" />
+		<result column="phone" property="phone" />
+		<result column="address" property="address" />
+		<result column="createdBy" property="createdBy" />
+		<result column="creationDate" property="creationDate" />
+	</resultMap>
+	<resultMap type="User" id="userRoleMap" extends="userMap">
+		<association property="role" javaType="Role">
+			<id column="id" property="id" />
+			<result column="roleName" property="roleName" />
+			<result column="roleCode" property="roleCode" />
+		</association>
+	</resultMap>
+	<select id="findAllUser" resultMap="userRoleMap">
+		select u.*,r.* from
+		smbms_user u,smbms_role r where u.userRole=r.id
+	</select>
+	<select id="login" resultType="User" parameterType="String">
+		select * from
+		smbms_user where userCode=#{userCode}
+	</select>
+	<select id="findUserById" resultMap="userRoleMap">
+		select u.*,r.* from
+		smbms_user u,smbms_role r where u.userRole=r.id and u.id=#{id}
+	</select>
+	<select id="findAllRole" resultType="Role">
+		select * from smbms_role
+	</select>
+	<insert id="userAdd">
+		insert into
+		smbms_user(id,userCode,userName,userPassword,gender,birthday,phone,address,userRole)
+		values(null,#{userCode},#{userName},#{userPassword},#{gender},#{birthday},#{phone},#{address},#{userRole})
+	</insert>
+	<update id="userModify">
+		update smbms_user set
+		userName=#{userName},gender=#{gender},birthday=#{birthday},
+		Phone=#{phone},address=#{address},userRole=#{userRole}
+		where id=#{id}
+	</update>
+	<select id="findCode" resultType="User">
+		select * from smbms_user where
+		userCode=#{userCode}
+	</select>
+	<delete id="userDel">
+		delete from smbms_user where id=#{id}
+	</delete>
+	<select id="findByNameAndRole" resultMap="userRoleMap">
+		select u.*,r.* from smbms_user u,smbms_role r where u.userRole=r.id
+		<if test="userName != null and userName != ''">
+			and userName like CONCAT("%",#{userName},"%")
+		</if>
+		<if test="userRole != null and userRole != ''">
+			and userRole=#{userRole}
+		</if>
+	</select>
+	<update id="pwdModify">
+		update smbms_user set userPassword=#{newpassword}
+		where id=#{id}
+	</update>
+	<select id="findUserCount" resultType="int">
+		select count(1) from smbms_user
+		<where>
+			<if test="userName != null and userName != ''">
+				and userName like CONCAT("%",#{userName},"%")
+			</if>
+			<if test="userRole != null and userRole != ''">
+				and userRole=#{userRole}
+			</if>
+		</where>
+	</select>
+	<select id="findUserByCount" resultMap="userRoleMap">
+		select u.*,r.* from smbms_user u,smbms_role r where u.userRole=r.id
+		<if test="userName != null and userName != ''">
+			and userName like CONCAT("%",#{userName},"%")
+		</if>
+		<if test="userRole != null and userRole != ''">
+			and userRole=#{userRole}
+		</if>
+		limit #{currentPage},#{size}
+	</select>
+</mapper>
