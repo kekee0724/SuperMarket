@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smbms.dao.provider.ProviderMapper">
+	<select id="findAllProvider" resultType="Provider">
+		select * from smbms_provider
+	</select>
+	<select id="findProvider" resultType="Provider">
+		select * from smbms_provider where id=#{id}
+	</select>
+	<update id="proModify">
+		update smbms_provider set proCode=#{proCode},proName=#{proName},proContact=#{proContact},
+			proPhone=#{proPhone},ProAddress=#{proAddress},proFax=#{proFax},proDesc=#{proDesc}
+			where id=#{id}
+	</update>
+	<delete id="proDelete">
+		delete from smbms_provider where id=#{id}
+	</delete>
+	<select id="findBill" resultType="int">
+		SELECT COUNT(1) FROM smbms_bill WHERE providerId=#{id}
+	</select>
+	<insert id="proAdd">
+		insert into smbms_provider(id,proCode,proName,proDesc,proContact,proPhone,proAddress,proFax,creationDate)
+				values(null,#{proCode},#{proName},#{proDesc},#{proContact},#{proPhone},#{proAddress},#{proFax},#{creationDate})
+	</insert>
+	 <select id="findByProCodeOrProName" resultType="Provider">
+		select * from smbms_provider
+		<where>
+			<if test="proCode != null and proCode != ''">
+				and proCode like CONCAT("%",#{proCode},"%")
+			</if>
+			<if test="proName != null and proName != ''">
+				and proName like CONCAT("%",#{proName},"%")
+			</if>
+		</where>
+	</select> 
+</mapper>
